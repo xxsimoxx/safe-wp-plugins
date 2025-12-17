@@ -13,7 +13,7 @@
 
 namespace XXSimoXX\SafeWPPlugins;
 
-if (!defined('ABSPATH')) {
+if ( !defined( 'ABSPATH' ) ) {
 	return;
 }
 
@@ -33,7 +33,7 @@ class SafeWPPlugins {
 
 	private function init_wp_version() {
 		global $wp_version;
-		$this->wp_version = preg_replace('/^([\d]+.[\d]+).*/', '\1', $wp_version);
+		$this->wp_version = preg_replace( '/^([\d]+.[\d]+).*/', '\1', $wp_version );
 	}
 
 	public function get_safe_plugins() {
@@ -41,8 +41,8 @@ class SafeWPPlugins {
 	}
 
 	public function search_plugins() {
-		$result = array();
-		$response = plugins_api (
+		$result   = array();
+		$response = plugins_api(
 			'query_plugins',
 			array(
 				'per_page' => 100,
@@ -69,7 +69,7 @@ class SafeWPPlugins {
 				if ( ! in_array( $plugin['slug'], $this->plugins ) ) {
 					continue;
 				}
-				$res->plugins[$index]['requires'] = $this->wp_version;
+				$res->plugins[ $index ]['requires'] = $this->wp_version;
 			}
 		}
 		return $res;
@@ -84,4 +84,4 @@ class SafeWPPlugins {
 
 }
 
-$safe_wp_plugins = new SafeWPPlugins;
+$safe_wp_plugins = new SafeWPPlugins();

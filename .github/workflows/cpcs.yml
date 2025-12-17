@@ -14,7 +14,12 @@ jobs:
         - uses: actions/checkout@v4
         - name: CPCS get rules
           run: |
-            wget -O phpcs.xml.dist https://raw.githubusercontent.com/ClassicPress/ClassicPress-Coding-Standards/main/phpcs.xml
+            wget -O phpcs.xml https://raw.githubusercontent.com/ClassicPress/ClassicPress-Coding-Standards/main/phpcs.xml
+            sed -i '/^\t<!-- start config -->.*/a\
+              <file>.</file>
+              ' phpcs.xml
+            sed -i '/MY_DOMAIN/ s//safe-wp-plugins/' phpcs.xml
+            mv phpcs.xml phpcs.xml.dist
         - name: CPCS checks
           uses: 10up/wpcs-action@v1.7.0
           with:
