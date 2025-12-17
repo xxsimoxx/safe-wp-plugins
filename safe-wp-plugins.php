@@ -8,7 +8,7 @@
  * Author:       Simone Fioravanti
  * Author URI:   https://simonefioravanti.it
  * Requires PHP: 7.4
- * Requires CP:  2.6
+ * Requires CP:  2.7
  */
 
 namespace XXSimoXX\SafeWPPlugins;
