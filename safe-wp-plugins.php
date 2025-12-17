@@ -13,7 +13,7 @@
 
 namespace XXSimoXX\SafeWPPlugins;
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	return;
 }
 
@@ -49,7 +49,7 @@ class SafeWPPlugins {
 				'tag'      => 'classicpress',
 			)
 		);
-		if ( is_wp_error( $response ) || ! isset ( $response->plugins ) ) {
+		if ( is_wp_error( $response ) || ! isset( $response->plugins ) ) {
 			return $result;
 		};
 		foreach ( $response->plugins as $plugin ) {
