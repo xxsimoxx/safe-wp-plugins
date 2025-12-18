@@ -115,7 +115,6 @@ class SafeWPPlugins {
 		}
 		return $plugin_data;
 	}
-
 }
 
 $safe_wp_plugins = new SafeWPPlugins();
