@@ -19,10 +19,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SafeWPPlugins {
 
-	private $plugins = array(
+	const HARDCODED_PLUGINS = array(
 		'very-simple-event-list',
 		'aaa',
 	);
+
+	private $plugins = array();
 
 	private $wp_version = null;
 
@@ -37,12 +39,25 @@ class SafeWPPlugins {
 		$this->wp_version = preg_replace( '/^([\d]+.[\d]+).*/', '\1', $wp_version );
 	}
 
+	private function init_safe_plugins() {
+		if ( ! empty( $this->plugins ) ) {
+			return;
+		}
+		$tagged_classicpress = $this->search_classicpress_plugins();
+		$this->plugins = array_merge( self::HARDCODED_PLUGINS, $tagged_classicpress );
+	}
+
 	public function get_safe_plugins() {
 		return $this->plugins;
 	}
 
-	public function search_plugins() {
+	public function search_classicpress_plugins( $force_api = false ) {
+		$result = get_transient( 'cp_wp_plugins_tagged_classicpress' );
+		if ( $force_api === false && $result !== false && is_array( $result ) ) {
+			return $result;
+		}
 		$result   = array();
+		require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 		$response = plugins_api(
 			'query_plugins',
 			array(
@@ -56,10 +71,12 @@ class SafeWPPlugins {
 		foreach ( $response->plugins as $plugin ) {
 			$result[] = $plugin['slug'];
 		}
+		set_transient( 'cp_wp_plugins_tagged_classicpress', $result, 48 * HOUR_IN_SECONDS );
 		return $result;
 	}
 
 	public function trick_api( $res, $action, $args ) {
+		$this->init_safe_plugins();
 		if ( $action === 'plugin_information' ) {
 			if ( in_array( $res->slug, $this->plugins ) ) {
 				if ( version_compare( $res->requires, $this->wp_version, 'gt' ) ) {
@@ -81,6 +98,7 @@ class SafeWPPlugins {
 	}
 
 	public function trick_plugin_data( $plugin_data, $plugin_file, $markup, $translate ) {
+		$this->init_safe_plugins();
 		if ( in_array( basename( dirname( plugin_basename( $plugin_file ) ) ), $this->plugins ) && isset( $plugin_data['RequiresWP'] ) ) {
 			if ( version_compare( $plugin_data['RequiresWP'], $this->wp_version, 'gt' ) ) {
 				$plugin_data['RequiresWP'] = $this->wp_version;
