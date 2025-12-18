@@ -21,6 +21,7 @@ class SafeWPPlugins {
 
 	private $plugins = array(
 		'very-simple-event-list',
+		'aaa',
 	);
 
 	private $wp_version = null;
@@ -61,7 +62,9 @@ class SafeWPPlugins {
 	public function trick_api( $res, $action, $args ) {
 		if ( $action === 'plugin_information' ) {
 			if ( in_array( $res->slug, $this->plugins ) ) {
-				$res->requires = $this->wp_version;
+				if ( version_compare( $res->requires, $this->wp_version, 'gt' ) ) {
+					$res->requires = $this->wp_version;
+				}
 			}
 		}
 		if ( $action === 'query_plugins' ) {
@@ -69,7 +72,9 @@ class SafeWPPlugins {
 				if ( ! in_array( $plugin['slug'], $this->plugins ) ) {
 					continue;
 				}
-				$res->plugins[ $index ]['requires'] = $this->wp_version;
+				if ( version_compare( $res->plugins[ $index ]['requires'], $this->wp_version, 'gt' ) ) {
+					$res->plugins[ $index ]['requires'] = $this->wp_version;
+				}
 			}
 		}
 		return $res;
@@ -77,7 +82,9 @@ class SafeWPPlugins {
 
 	public function trick_plugin_data( $plugin_data, $plugin_file, $markup, $translate ) {
 		if ( in_array( basename( dirname( plugin_basename( $plugin_file ) ) ), $this->plugins ) && isset( $plugin_data['RequiresWP'] ) ) {
-			$plugin_data['RequiresWP'] = $this->wp_version;
+			if ( version_compare( $plugin_data['RequiresWP'], $this->wp_version, 'gt' ) ) {
+				$plugin_data['RequiresWP'] = $this->wp_version;
+			}
 		}
 		return $plugin_data;
 	}
