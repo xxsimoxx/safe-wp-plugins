@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:  Safe WordPress Plugins
+ * Plugin Name:  Safe WP Plugins
  * Description:  Allow to install and activate WP plugins that are working on ClassicPress.
  * Version:      0.0.1
  * License:      GPL2
@@ -21,7 +21,6 @@ class SafeWPPlugins {
 
 	const HARDCODED_PLUGINS = array(
 		'very-simple-event-list',
-		'aaa',
 	);
 
 	private $plugins = array();
@@ -44,7 +43,17 @@ class SafeWPPlugins {
 			return;
 		}
 		$tagged_classicpress = $this->search_classicpress_plugins();
-		$this->plugins = array_merge( self::HARDCODED_PLUGINS, $tagged_classicpress );
+		$safe_plugins        = array_merge( self::HARDCODED_PLUGINS, $tagged_classicpress );
+
+		/**
+		 * Filters the Plugins considered safe.
+		 *
+		 * The slugs to be used are the ones reported by the WP API.
+		 *
+		 *
+		 * @param array $safe_plugins Slugs of plugins considered safe.
+		*/
+		$this->plugins = apply_filters( 'cp_local_safe_wp_plugins', $safe_plugins );
 	}
 
 	public function get_safe_plugins() {
