@@ -6,8 +6,6 @@ ClassicPress is currently having `$wp_version = '6.2.8'`.
 The "safe" plugin list is build merging:
 - a static list
 - a list prom WP API of plugins tagged "classicpress"
-- a list from the filter `cp_safe_wp_plugins`
-
 
 ### `cp_local_safe_wp_plugins` hook
 This hook is intended to add or remove plugins to the list of those considered working.
