@@ -2,7 +2,7 @@
 /**
  * Plugin Name:  Safe WP Plugins
  * Description:  Allow to install and activate WP plugins that are working on ClassicPress.
- * Version:      0.0.1
+ * Version:      0.0.2
  * License:      GPL2
  * License URI:  https://www.gnu.org/licenses/gpl-2.0.html
  * Author:       Simone Fioravanti
@@ -20,15 +20,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 class SafeWPPlugins {
 
 	const HARDCODED_PLUGINS = array(
+		'display-a-quote',
+		'very-simple-contact-form',
 		'very-simple-event-list',
+		'very-simple-link-manager',
 	);
 
-	private $plugins = array();
+	private $plugins       = array();
+	private $wp_version    = null;
 
-	private $wp_version = null;
-
-	public function __construct( $use_tags = true ) {
+	public function __construct() {
 		$this->init_wp_version();
+		$this->init_safe_plugins();
 		add_filter( 'plugins_api_result', array( $this, 'trick_api' ), 100, 4 );
 		add_filter( 'get_plugin_data', array( $this, 'trick_plugin_data' ), 100, 5 );
 	}
@@ -46,7 +49,7 @@ class SafeWPPlugins {
 		$safe_plugins        = array_merge( self::HARDCODED_PLUGINS, $tagged_classicpress );
 
 		/**
-		 * Filters the Plugins considered safe.
+		 * Filters the plugins considered safe.
 		 *
 		 * The slugs to be used are the ones reported by the WP API.
 		 *
@@ -60,12 +63,12 @@ class SafeWPPlugins {
 		return $this->plugins;
 	}
 
-	public function search_classicpress_plugins( $force_api = false ) {
+	public function search_classicpress_plugins() {
 		$result = get_transient( 'cp_wp_plugins_tagged_classicpress' );
-		if ( $force_api === false && $result !== false && is_array( $result ) ) {
+		if ( $result !== false && is_array( $result ) ) {
 			return $result;
 		}
-		$result   = array();
+		$result = array();
 		require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 		$response = plugins_api(
 			'query_plugins',
@@ -85,7 +88,6 @@ class SafeWPPlugins {
 	}
 
 	public function trick_api( $res, $action, $args ) {
-		$this->init_safe_plugins();
 		if ( $action === 'plugin_information' ) {
 			if ( in_array( $res->slug, $this->plugins ) ) {
 				if ( version_compare( $res->requires, $this->wp_version, 'gt' ) ) {
@@ -107,7 +109,6 @@ class SafeWPPlugins {
 	}
 
 	public function trick_plugin_data( $plugin_data, $plugin_file, $markup, $translate ) {
-		$this->init_safe_plugins();
 		if ( in_array( basename( dirname( plugin_basename( $plugin_file ) ) ), $this->plugins ) && isset( $plugin_data['RequiresWP'] ) ) {
 			if ( version_compare( $plugin_data['RequiresWP'], $this->wp_version, 'gt' ) ) {
 				$plugin_data['RequiresWP'] = $this->wp_version;
