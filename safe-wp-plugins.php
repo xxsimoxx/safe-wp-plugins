@@ -24,6 +24,7 @@ class SafeWPPlugins {
 		'very-simple-contact-form',
 		'very-simple-event-list',
 		'very-simple-link-manager',
+		'very-simple-knowledge-base',
 	);
 
 	private $plugins       = array();
