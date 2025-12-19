@@ -36,7 +36,7 @@ class SafeWPPlugins {
 		add_filter( 'plugins_api_result', array( $this, 'trick_api' ), 100, 4 );
 		add_filter( 'get_plugin_data', array( $this, 'trick_plugin_data' ), 100, 5 );
 
-		register_activation_hook( __FILE__, array( $this, 'init_safe_plugins' );
+		register_activation_hook( __FILE__, array( $this, 'init_safe_plugins' ) );
 	}
 
 	private function init_wp_version() {
