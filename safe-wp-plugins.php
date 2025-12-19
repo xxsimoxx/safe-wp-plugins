@@ -32,11 +32,9 @@ class SafeWPPlugins {
 
 	public function __construct() {
 		$this->init_wp_version();
-
+		$this->init_safe_plugins();
 		add_filter( 'plugins_api_result', array( $this, 'trick_api' ), 100, 4 );
 		add_filter( 'get_plugin_data', array( $this, 'trick_plugin_data' ), 100, 5 );
-
-		register_activation_hook( __FILE__, array( $this, 'init_safe_plugins' ) );
 	}
 
 	private function init_wp_version() {
@@ -91,7 +89,6 @@ class SafeWPPlugins {
 	}
 
 	public function trick_api( $res, $action, $args ) {
-		$this->init_safe_plugins();
 		if ( $action === 'plugin_information' ) {
 			if ( in_array( $res->slug, $this->plugins ) ) {
 				if ( version_compare( $res->requires, $this->wp_version, 'gt' ) ) {
@@ -113,7 +110,6 @@ class SafeWPPlugins {
 	}
 
 	public function trick_plugin_data( $plugin_data, $plugin_file, $markup, $translate ) {
-		$this->init_safe_plugins();
 		if ( in_array( basename( dirname( plugin_basename( $plugin_file ) ) ), $this->plugins ) && isset( $plugin_data['RequiresWP'] ) ) {
 			if ( version_compare( $plugin_data['RequiresWP'], $this->wp_version, 'gt' ) ) {
 				$plugin_data['RequiresWP'] = $this->wp_version;
